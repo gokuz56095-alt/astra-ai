@@ -1,31 +1,46 @@
-// api/chat.js
-export const config = {
-  runtime: 'edge',
-};
+// api/chat.js — Vercel Node.js Function
 
-export default async function handler(req) {
-  // Chỉ cho phép phương thức POST
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    });
+export default async function handler(req, res) {
+  const origin = req.headers.origin || '';
+
+  // Đọc allowlist mỗi lần gọi (đảm bảo env mới nhất)
+  const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  // CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : 'null',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+  };
+
+  // Preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(204).set(corsHeaders).end();
   }
 
-  // Lấy API key từ biến môi trường
+  if (req.method !== 'POST') {
+    return res.status(405).set(corsHeaders).json({ error: 'Method not allowed' });
+  }
+
+  // Domain lock
+  if (ALLOWED_ORIGINS.length > 0 && origin && !ALLOWED_ORIGINS.includes(origin)) {
+    return res.status(403).set(corsHeaders).json({ error: 'Forbidden: Invalid origin' });
+  }
+
   const API_KEY = process.env.XAH_API_KEY;
   if (!API_KEY) {
-    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(500).set(corsHeaders).json({ error: 'Server configuration error' });
   }
 
   try {
-    const body = await req.json();
+    // req.body tự được parse nếu Content-Type là application/json
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
-    // Gọi đến API gốc của bạn
-    const response = await fetch('https://api.xah.io/v1/chat/completions', {
+    const upstream = await fetch('https://api.xah.io/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
@@ -34,17 +49,18 @@ export default async function handler(req) {
       body: JSON.stringify(body),
     });
 
-    // Trả về phản hồi từ API gốc
-    return new Response(response.body, {
-      status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const text = await upstream.text();
+    const status = upstream.status;
+
+    // Set content-type JSON + CORS
+    res.setHeader('Content-Type', 'application/json');
+    for (const [k, v] of Object.entries(corsHeaders)) res.setHeader(k, v);
+    return res.status(status).send(text);
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
+    console.error('[api/chat] Error:', error);
+    return res.status(500).set(corsHeaders).json({
+      error: 'Internal server error',
+      detail: error.message,
     });
   }
 }
