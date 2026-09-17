@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root,
+#root > div {
+  overflow: visible !important;
+}
+
+html, body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+               'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: 'ss01', 'cv01', 'kern';
+  font-variant-ligatures: common-ligatures;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background-color: #FFFFFF;
+  color: #1A1A1A;
+}
+
+code, pre, .font-mono {
+  font-family: 'Geist Mono', 'SF Mono', Menlo, Monaco, 'Cascadia Mono', 
+               'Roboto Mono', 'Courier New', monospace;
+  font-feature-settings: normal;
+  letter-spacing: 0;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #9A9A9A 0%,
+    #9A9A9A 35%,
+    #1A1A1A 50%,
+    #9A9A9A 65%,
+    #9A9A9A 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 2.2s linear infinite;
+}
+
+@keyframes wave {
+  0%, 60%, 100% { transform: translateY(0);    opacity: 0.35; }
+  30%           { transform: translateY(-4px); opacity: 1;    }
+}
+.wave-dot {
+  animation: wave 1.3s ease-in-out infinite;
+}
+
+.markdown-content {
+  color: #1A1A1A;
+  font-size: 16px;
+  line-height: 1.7;
+  word-wrap: break-word;
+}
+.markdown-content > *:first-child { margin-top: 0 !important; }
+.markdown-content > *:last-child  { margin-bottom: 0 !important; }
+
+.markdown-content p {
+  margin: 0 0 12px 0;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #0A0A0A;
+}
+.markdown-content em { font-style: italic; }
+.markdown-content del {
+  text-decoration: line-through;
+  color: #8B8B8B;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  font-weight: 600;
+  color: #0A0A0A;
+  margin: 20px 0 10px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.markdown-content h1 { font-size: 24px; }
+.markdown-content h2 { font-size: 20px; }
+.markdown-content h3 { font-size: 18px; }
+.markdown-content h4 { font-size: 16px; }
+
+.markdown-content ul,
+.markdown-content ol {
+  margin: 8px 0 12px;
+  padding-left: 24px;
+}
+.markdown-content ul { list-style: disc; }
+.markdown-content ol { list-style: decimal; }
+.markdown-content li { margin: 4px 0; }
+.markdown-content li > p { margin: 0; }
+
+.markdown-content a {
+  color: #4D6BFE;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.markdown-content a:hover { color: #3D5AEB; }
+
+.markdown-content blockquote {
+  border-left: 3px solid #E5E5E5;
+  padding-left: 14px;
+  color: #6B6B6B;
+  margin: 12px 0;
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid #E5E5E5;
+  margin: 18px 0;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  margin: 14px 0;
+  width: 100%;
+  font-size: 15px;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.markdown-content thead {
+  background: #F7F7F7;
+}
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #E5E5E5;
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.markdown-content th {
+  font-weight: 600;
+  color: #0A0A0A;
+}
+
+.markdown-content code.inline-code {
+  background: #F0F0F0;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #D6336C;
+  white-space: break-spaces;
+}
+
+.markdown-content input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+/* =========================================================
+   MATHJAX — Inline & Block math
+   ========================================================= */
+.markdown-content .math-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 3px;
+  color: #1A1A1A;
+}
+
+.markdown-content .math-inline svg {
+  vertical-align: middle;
+  max-width: 100%;
+}
+
+.markdown-content .math-display {
+  display: block;
+  text-align: center;
+  margin: 16px 0;
+  padding: 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  color: #1A1A1A;
+}
+
+.markdown-content .math-display svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fallback nếu MathJax dùng class khác */
+.markdown-content .math {
+  color: #1A1A1A;
+}
+
+/* Scrollbar mảnh cho công thức dài */
+.markdown-content .math-display::-webkit-scrollbar {
+  height: 6px;
+}
+.markdown-content .math-display::-webkit-scrollbar-thumb {
+  background: #D5D5D5;
+  border-radius: 999px;
+}
+.markdown-content .math-display::-webkit-scrollbar-track {
+  background: transparent;
+}
